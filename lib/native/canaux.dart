@@ -8,6 +8,10 @@ class CanauxNatifs {
   static const _permission = MethodChannel('audio/permission');
   static const _audio = EventChannel('audio/niveau');
   static const _proximite = EventChannel('capteur/proximite');
+  static const _torche = MethodChannel('appareil/torche');
+
+  static Future<void> allumerTorche(bool etat) =>
+    _torche.invokeMethod('allumer', {'etat': etat});
 
   static Stream<bool> proximite() =>
      _proximite.receiveBroadcastStream().map((v) => v as bool);

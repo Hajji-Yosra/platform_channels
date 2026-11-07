@@ -60,6 +60,12 @@ class MainActivity : FlutterActivity() {
 
         // Exercice 1 : capteur de proximité
         EventChannel(messager, "capteur/proximite").setStreamHandler(CapteurProximite(this))
+
+        // Exercice 2 : lampe torche
+        MethodChannel(messager, "appareil/torche").setMethodCallHandler(Torche(this))// Exercice 2 : lampe torche
+        MethodChannel(messager, "appareil/torche").setMethodCallHandler(Torche(this))
+
+
     }
 
     // L'utilisateur a répondu à la boîte de dialogue

@@ -97,6 +97,15 @@ class _PageCanauxState extends State<PageCanaux> {
   _abonnementProximite?.cancel();
   }
   
+  bool _torcheAllumee = false;
+  Future<void> _changerTorche(bool etat) async {
+  try {
+    await CanauxNatifs.allumerTorche(etat);
+    setState(() => _torcheAllumee = etat);
+  } on PlatformException catch (e) {
+    _message('Erreur ${e.code} : ${e.message}');
+  }
+  }
 
 
   void _message(String texte) => ScaffoldMessenger.of(context)
@@ -175,6 +184,13 @@ class _PageCanauxState extends State<PageCanaux> {
           ),
         ]),
 
+        _carte('6. Lampe torche (MethodChannel)', [
+          SwitchListTile(
+            title: const Text('Torche'),
+            value: _torcheAllumee,
+            onChanged: _changerTorche,
+        ),
+]),
 
         ],
       ),
