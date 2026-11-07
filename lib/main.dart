@@ -8,35 +8,6 @@ void main() => runApp(const MaterialApp(
       home: PageCanaux(),
     ));
 
-class CanauxNatifs {
-  static const _infos = MethodChannel('appareil/infos');   // même nom qu'en Kotlin
-
-  static Future<Map<String, dynamic>> lireInfos() async {
-    final infos = await _infos.invokeMapMethod<String, dynamic>('lire');
-    return infos ?? {};
-  }
-
-  static const _vibreur = MethodChannel('appareil/vibrer');
-
-  static Future<void> vibrer(String motif) =>
-      _vibreur.invokeMethod('vibrer', {'motif': motif});   // arguments = un Map
-
-  static const _lumiere = EventChannel('capteur/lumiere');
-
-  static Stream<double> lumiere() =>
-      _lumiere.receiveBroadcastStream().map((v) => (v as num).toDouble());
-
-  static const _permission = MethodChannel('audio/permission');
-  static const _audio = EventChannel('audio/niveau');
-
-  static Future<bool> demanderMicro() async =>
-      await _permission.invokeMethod<bool>('demander') ?? false;
-
-  static Stream<double> niveauSonore() =>
-      _audio.receiveBroadcastStream().map((v) => (v as num).toDouble());
-
-
-}
 
 
 class PageCanaux extends StatefulWidget {
@@ -109,6 +80,23 @@ class _PageCanauxState extends State<PageCanaux> {
     });
   }
 
+  bool? _proche;
+  StreamSubscription<bool>? _abonnementProximite;
+
+  void _basculerProximite() {
+  if (_abonnementProximite == null) {
+    _abonnementProximite = CanauxNatifs.proximite().listen(
+      (proche) => setState(() => _proche = proche),
+      onError: (e) => _message('Proximité : ${(e as PlatformException).message}'),
+    );
+  } else {
+    _abonnementProximite!.cancel();
+    _abonnementProximite = null;
+  }
+  setState(() {});
+  _abonnementProximite?.cancel();
+  }
+  
 
 
   void _message(String texte) => ScaffoldMessenger.of(context)
@@ -174,6 +162,18 @@ class _PageCanauxState extends State<PageCanaux> {
               child: Text(_abonnementAudio == null ? 'Écouter' : 'Arrêter'),
             ),
           ]),
+
+        _carte('5. Capteur de proximité (EventChannel)', [
+          Text(
+            _proche == null ? '—' : (_proche! ? 'Proche' : 'Loin'),
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 8),
+          FilledButton(
+            onPressed: _basculerProximite,
+            child: Text(_abonnementProximite == null ? 'Démarrer' : 'Arrêter'),
+          ),
+        ]),
 
 
         ],

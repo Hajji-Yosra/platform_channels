@@ -58,6 +58,8 @@ class MainActivity : FlutterActivity() {
         // Étape 4b : flux du niveau sonore
         EventChannel(messager, "audio/niveau").setStreamHandler(NiveauSonore(scope))
 
+        // Exercice 1 : capteur de proximité
+        EventChannel(messager, "capteur/proximite").setStreamHandler(CapteurProximite(this))
     }
 
     // L'utilisateur a répondu à la boîte de dialogue
